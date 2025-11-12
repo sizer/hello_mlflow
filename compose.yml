@@ -1,3 +1,5 @@
+version: "3.8"
+
 services:
   dev:
     build:
@@ -9,13 +11,21 @@ services:
     networks:
       default:
   mlflow:
-    build:
-      context: .
-      dockerfile: .devcontainer/Dockerfile
-    # volumes:
-    #   - ./:/src/
+    image: ghcr.io/mlflow/mlflow:v3.6.0
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_HOST=0.0.0.0
+      - MLFLOW_BACKEND_STORE_URI=sqlite:////mlflow/mlflow.db
+      - MLFLOW_ARTIFACT_ROOT=/mlflow/artifacts
+      - MLFLOW_SERVER_ALLOWED_HOSTS=mlflow:5000,localhost:5000,127.0.0.1:*,0.0.0.0:*
+    volumes:
+      - mlflow_data:/mlflow
+    entrypoint: mlflow server
     tty: true
     networks:
-      default:  
+      default:
+volumes:
+  mlflow_data:
 networks:
   default:

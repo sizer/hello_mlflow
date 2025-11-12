@@ -8,6 +8,12 @@ from typing_extensions import TypedDict, Annotated
 import operator
 import os
 
+import mlflow
+
+mlflow.set_tracking_uri("http://mlflow:5000")
+mlflow.set_experiment("1_decorator_cliapp")
+mlflow.bedrock.autolog()
+
 AWS_ACCOUNT_ID = os.environ.get("AWS_ACCOUNT_ID")
 AWS_REGION = os.environ.get("AWS_REGION", "us-west-2")
 

@@ -9,4 +9,5 @@ dependencies = [
     "langchain>=1.0.5",
     "langchain-aws>=1.0.0",
     "langgraph>=1.0.3",
+    "mlflow>=3.6",
 ]
