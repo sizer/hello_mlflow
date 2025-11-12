@@ -1,21 +1,25 @@
+import os
+import mlflow
+
 from IPython.display import Image, display
-from langchain_aws import ChatBedrockConverse
 from langchain.messages import AnyMessage, HumanMessage, ToolMessage, SystemMessage
 from langchain.tools import tool
+from langchain_aws import ChatBedrockConverse
 from langgraph.graph import StateGraph, START, END
 from typing import Literal
 from typing_extensions import TypedDict, Annotated
 import operator
-import os
 
-import mlflow
+AWS_ACCOUNT_ID = os.environ["AWS_ACCOUNT_ID"]
+AWS_REGION = os.environ.get("AWS_REGION", "us-west-2")
 
-mlflow.set_tracking_uri("http://mlflow:5000")
-mlflow.set_experiment("1_decorator_cliapp")
+MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI", "http://localhost:5000")
+MLFLOW_EXPERIMENT_ID = os.environ.get("MLFLOW_EXPERIMENT_ID", "default")
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_experiment(MLFLOW_EXPERIMENT_ID)
 mlflow.bedrock.autolog()
 
-AWS_ACCOUNT_ID = os.environ.get("AWS_ACCOUNT_ID")
-AWS_REGION = os.environ.get("AWS_REGION", "us-west-2")
 
 model = ChatBedrockConverse(
     model=f"arn:aws:bedrock:{AWS_REGION}:{AWS_ACCOUNT_ID}:inference-profile/us.anthropic.claude-haiku-4-5-20251001-v1:0",
