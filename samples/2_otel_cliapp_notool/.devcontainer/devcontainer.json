@@ -1,0 +1,44 @@
+{
+    "name": "uv",
+    "dockerComposeFile": [
+        "../compose.yml"
+    ],
+    "service": "dev",
+    "workspaceFolder": "/src",
+    "postCreateCommand": "uv sync",
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                }
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-python.debugpy",
+                "ms-python.vscode-pylance",
+                "charliermarsh.ruff",
+                "yzhang.markdown-all-in-one"
+            ]
+        }
+    },
+    "mounts": [
+        {
+            "source": "${env:HOME}/.aws",
+            "target": "/root/.aws",
+            "type": "bind"
+        },
+        {
+            "source": "uv-cache",
+            "target": "/root/.cache/uv",
+            "type": "volume"
+        },
+        {
+            "target": "${containerWorkspaceFolder}/.venv",
+            "type": "volume"
+        },
+    ]
+}

@@ -1,0 +1,45 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      - ./:/src/
+    ports:
+      - "8000:8000"
+    tty: true
+    networks:
+      default:
+  otel:
+    image: otel/opentelemetry-collector:latest
+    volumes:
+      - ./opentelemetry-collector.yaml:/etc/otelcol/config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_EXPERIMENT_ID=0
+      - OTEL_EXPERIMENTAL_CONFIG_FILE=/etc/otelcol/config.yaml
+    tty: true
+    networks:
+      default:
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.6.0
+    ports:
+      - "5000:5000"
+    environment:
+      - MLFLOW_HOST=0.0.0.0
+      - MLFLOW_BACKEND_STORE_URI=sqlite:////mlflow/mlflow.db
+      - MLFLOW_ARTIFACT_ROOT=/mlflow/artifacts
+      - MLFLOW_SERVER_ALLOWED_HOSTS=mlflow:5000,localhost:5000
+    volumes:
+      - mlflow_data:/mlflow
+    entrypoint: mlflow server --dev
+    tty: true
+    networks:
+      default:
+volumes:
+  mlflow_data:
+networks:
+  default:
