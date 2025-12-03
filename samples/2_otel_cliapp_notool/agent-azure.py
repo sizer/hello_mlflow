@@ -1,10 +1,10 @@
 import os
 
 from dotenv import load_dotenv
-from openai import AzureOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import AzureChatOpenAI
 from opentelemetry import trace
 from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.instrumentation.openai import OpenAIInstrumentor
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
@@ -30,17 +30,12 @@ otlp_exporter = OTLPSpanExporter(
 processor = BatchSpanProcessor(otlp_exporter)
 provider.add_span_processor(processor)
 trace.set_tracer_provider(provider)
-OpenAIInstrumentor().instrument()
-client = AzureOpenAI(
-    api_version=os.environ.get("OPENAI_API_VERSION", "2024-05-01-preview"),
-)
-deployment_name = os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"]
-topic = "programming"
-prompt = f"Tell me a joke about {topic}"
 
-result = client.chat.completions.create(
-    model=deployment_name,
-    messages=[{"role": "user", "content": prompt}],
+prompt = ChatPromptTemplate.from_template("Tell me a joke about {topic}")
+model = AzureChatOpenAI(
+    deployment_name=os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"],
     temperature=0.1,
 )
-print(result.choices[0].message.content)
+chain = prompt | model
+result = chain.invoke({"topic": "programming"})
+print(result.content)
